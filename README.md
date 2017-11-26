@@ -8,4 +8,6 @@ Chatroom demo application using following technologies:
 To run:
  * git clone https://github.com/lmajamaa/chatroom-demo.git
  * npm install
+ * cd chatroom-demo
  * npm start
+ * http://localhost:3000
