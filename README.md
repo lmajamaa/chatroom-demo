@@ -1,10 +1,9 @@
 # chatroom-demo
 
-Installation
+To run
+ * git clone https://github.com/lmajamaa/chatroom-demo.git
  * npm install
- - npm start
+ * npm start
 
 Demo
 - http://azure.com
-
-"# chatroom-demo" 

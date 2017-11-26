@@ -1,0 +1,6 @@
+.modal .changeNameModal {
+  position: fixed;
+  float: left;
+  left: 40%;
+  top: 40%;
+}
