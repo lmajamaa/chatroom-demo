@@ -1,4 +1,4 @@
-/// <reference path="./interfaces.d.ts"/>
+/// <reference path="../types/interfaces.d.ts"/>
 
 import * as React from 'react';
 import { Navbar, Form, FormGroup, InputGroup, Button } from 'reactstrap';
