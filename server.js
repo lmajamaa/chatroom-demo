@@ -202,6 +202,12 @@ io.on('connection', function (socket) {
   });
   
   console.log(name + ' joined channel #' + socket.channel);
+  socket.emit('channelUpdate', {
+    user: "Server",
+    date: new Date(),
+    text: 'You have joined channel #' + socket.channel,
+    users: getUsersOnChannel(socket.channel)
+  });
   
   // Inform others that user has joined
   socket.to(socket.channel).emit('user:join', {
@@ -231,7 +237,7 @@ io.on('connection', function (socket) {
   socket.on('user:changeChannel', function(channelName){
     
     // Leave old channel
-		socket.leave(socket.channel);
+    socket.leave(socket.channel);
     console.log(name + ' left channel #' + socket.channel);
     socket.to(socket.channel).emit('user:message', {
       user: "Server",
@@ -246,9 +252,9 @@ io.on('connection', function (socket) {
     
     // Join new channel
     socket.channel = channelName;
-		socket.join(socket.channel);
+    socket.join(socket.channel);
     console.log(name + ' joined channel #' + socket.channel);
-		socket.emit('channelUpdate', {
+    socket.emit('channelUpdate', {
       user: "Server",
       date: new Date(),
       text: 'You have joined channel #' + socket.channel,
@@ -256,7 +262,7 @@ io.on('connection', function (socket) {
     });
     
     // Inform other users that new user has joined
-		socket.to(socket.channel).emit('user:message', {
+    socket.to(socket.channel).emit('user:message', {
       user: "Server",
       date: new Date(),
       text: name + ' has joined channel #' + socket.channel
@@ -267,7 +273,7 @@ io.on('connection', function (socket) {
       name: name,
       address: address
     });
-	});
+  });
   
   // New channel
   socket.on('user:newChannel', function(channelName){

@@ -32,8 +32,10 @@ export default class ChannelList extends React.Component<Props, State> {
     event.preventDefault();
   }
   changeChannel(targetChannel: string) {
-    this.setState({currentChannel: targetChannel});
-    this.props.channelChange(targetChannel);
+    if (this.state.currentChannel !== targetChannel) {    
+      this.setState({currentChannel: targetChannel});
+      this.props.channelChange(targetChannel);
+    }
   }
   
   render() {
