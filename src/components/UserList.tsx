@@ -2,24 +2,20 @@ import * as React from 'react';
 import '../styles/sidebar.css';
 
 interface Props {
-  user: string;
-  users: string[];
-  sidebarActive: boolean;
-  enablePrivateMessage: PrivateMessageToggle;
+    user: string;
+    users: string[];
+    sidebarActive: boolean;
+    enablePrivateMessage: PrivateMessageToggle;
 }
-interface State {
-  sidebarActive: boolean;
-}
+interface State { }
 export default class UserList extends React.Component<Props, State> {
-  constructor(props: any) {
+  constructor(props: Props) {
     super(props);
-    this.state = { sidebarActive: props.sidebarActive };
+
     this.getUsername = this.getUsername.bind(this);
     this.getRowClass = this.getRowClass.bind(this);
   }
-  componentWillReceiveProps(nextProps) {
-    this.setState({sidebarActive: nextProps.sidebarActive});
-  }
+  
   getUsername(user: string, currentUser: string) {
     if (user === currentUser) {
       return user + ' (you)';
@@ -28,7 +24,7 @@ export default class UserList extends React.Component<Props, State> {
     }
   }
   getRowClass() {
-    return this.state.sidebarActive ? 'row-offcanvas row-offcanvas-right active' : 'row-offcanvas row-offcanvas-right';
+    return this.props.sidebarActive ? 'row-offcanvas row-offcanvas-right active' : 'row-offcanvas row-offcanvas-right';
   }
   
   render() {
