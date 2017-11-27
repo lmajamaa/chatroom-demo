@@ -5,8 +5,8 @@ body, html {
 #main {
   height:100%;
   overflow:auto;
-  padding-top: 120px;
-  padding-bottom: 120px;
+  padding-top: 80px;
+  padding-bottom: 80px;
 }
 #root {
   height:100%;
@@ -19,7 +19,7 @@ body, html {
   z-index: 9999;
 }
 .navbar {
-  min-height: 120px;
+  min-height: 80px;
   background-color:#222229;
 }
 
@@ -37,22 +37,29 @@ a:hover {
   overflow:auto;
 }
 .row-offcanvas {
-    position: fixed;
-    top: 0px;
-    right: -220px;
-    bottom: 0px;
-    -webkit-transition: all 0.25s ease-out;
-    -moz-transition: all 0.25s ease-out;
-    transition: all 0.25s ease-out;
-    padding-top: 200px;
-    padding-bottom: 120px;
-    z-index: 5;
-  }
+  position: fixed;
+  top: 0px;
+  right: -220px;
+  bottom: 0px;
+  -webkit-transition: all 0.25s ease-out;
+  -moz-transition: all 0.25s ease-out;
+  transition: all 0.25s ease-out;
+  margin-top: 150px;
+  margin-bottom: 150px;
+  z-index: 5;
+}
 .row-offcanvas-right.active {
     right: 0;
-  }
+}
   
 @media (min-width: 768px) {
+  #main {
+    padding-top: 120px;
+    padding-bottom: 120px;
+  }
+  .navbar {
+    min-height: 120px;
+  }
   .row-offcanvas {
     right: 0px;
   }
@@ -60,5 +67,9 @@ a:hover {
 
 .messageForm {
   margin:0 auto; 
-  width: 50%;
+  width: 100%;
+}
+
+.messageForm .form-group {
+  margin-bottom: auto;
 }

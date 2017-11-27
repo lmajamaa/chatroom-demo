@@ -1,10 +1,3 @@
-/* .list-unstyled { */
-  /* display: flex; */
-  /* flex-direction: column;   */
-  /* justify-content: center;  */
-  /* align-items: center;      */
-/* } */
-
 .messageRow {
   min-height: 50px;
   max-width: 600px;

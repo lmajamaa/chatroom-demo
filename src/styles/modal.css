@@ -1,6 +1,17 @@
-.modal .changeNameModal {
-  position: fixed;
-  float: left;
-  left: 40%;
-  top: 40%;
+.modal {
+  text-align: center;
+}
+
+.modal:before {
+  display: inline-block;
+  vertical-align: middle;
+  content: " ";
+  height: 100%;
+}
+
+
+.changeNameModal {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
 }
