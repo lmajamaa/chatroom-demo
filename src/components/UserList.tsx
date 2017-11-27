@@ -8,12 +8,14 @@ interface Props {
     enablePrivateMessage: PrivateMessageToggle;
 }
 interface State {
+  sidebarActive: boolean;
 }
 export default class UserList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
     this.getUsername = this.getUsername.bind(this);
+    this.getRowClass = this.getRowClass.bind(this);
   }
   
   getUsername(user: string, currentUser: string) {
@@ -23,10 +25,13 @@ export default class UserList extends React.Component<Props, State> {
       return user;
     }
   }
+  getRowClass() {
+    return this.props.sidebarActive ? 'row-offcanvas row-offcanvas-right active' : 'row-offcanvas row-offcanvas-right';
+  }
   
   render() {
     return (
-      <div className={this.props.sidebarActive ? 'row-offcanvas row-offcanvas-right active' : 'row-offcanvas row-offcanvas-right'}>
+      <div className={this.getRowClass()}>
         <div id="sidebar" className="sidebar-offcanvas">
             <div className="col-md-12">
               <h5>Online users:</h5>
