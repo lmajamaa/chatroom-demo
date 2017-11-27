@@ -15,7 +15,7 @@ body, html {
 
 .toggleButton {
   float: right;
-  margin-top: 20px;
+  margin-top: 15px;
   z-index: 9999;
 }
 .navbar {

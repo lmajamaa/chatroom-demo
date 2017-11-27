@@ -10,7 +10,7 @@ import { Container, Col } from 'reactstrap';
 import '../styles/chatroom.css';
 
 import * as openSocket from 'socket.io-client';
-const socket = openSocket('http://localhost:3001');
+const socket = openSocket(window.location.hostname + ':3001');
 
 interface Props { }
 interface State {
@@ -198,7 +198,7 @@ export default class Chatroom extends React.Component<Props, State> {
           <Col md={12} className="container-fullsize">
             <p className="toggleButton d-block d-sm-none">
               <button type="button" className="btn btn-primary btn-xs" onClick={this.toggleSidebar}>
-                <i className={this.state.sidebarActive ? 'fa fa-chevron-right' : 'fa fa-chevron-left'}/> {this.state.sidebarActive ? '' : 'Show users'}
+                <i className={this.state.sidebarActive ? 'fa fa-chevron-right' : 'fa fa-chevron-left'}/> {this.state.sidebarActive ? '' : 'Users'}
                 </button>
             </p>
             <ul className="list-unstyled">

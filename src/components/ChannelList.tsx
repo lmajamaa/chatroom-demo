@@ -39,7 +39,7 @@ export default class ChannelList extends React.Component<Props, State> {
   render() {
     return (
       <Navbar dark={true} className="fixed-top" expand="md">
-        <NavbarBrand href="#"><img src={logo} className="app-logo" alt="logo" />Chatroom</NavbarBrand>
+        <NavbarBrand href="#"><img src={logo} className="app-logo"/>Chatroom</NavbarBrand>
         <NavbarToggler onClick={this.toggle} />
         <Collapse isOpen={this.state.isOpen} navbar={true}>
             <Nav navbar={true}>
