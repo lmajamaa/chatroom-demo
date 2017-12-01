@@ -46,7 +46,7 @@ export default class NameChangeModal extends React.Component<Props, State> {
             <ModalHeader toggle={this.toggle}>Choose your username</ModalHeader>
             <ModalBody>
               <InputGroup>
-                <Input onChange={this.changeHandler} value={this.state.newName} placeholder="Username" required={true}/>
+                <Input onChange={this.changeHandler} value={this.state.newName} placeholder="Username" required={true} autoFocus={true}/>
               </InputGroup>
             </ModalBody>
             <ModalFooter>

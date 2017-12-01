@@ -23,6 +23,7 @@ interface State {
   sidebarActive: boolean;
   nameChangeActive: boolean;
   privateMessageTo: string;
+  focusMessageBar: boolean;
 }
 
 export default class Chatroom extends React.Component<Props, State> {
@@ -37,7 +38,8 @@ export default class Chatroom extends React.Component<Props, State> {
       message: '',
       sidebarActive: false,
       nameChangeActive: true,
-      privateMessageTo: ''
+      privateMessageTo: '',
+      focusMessageBar: false
     };
     
     this._initialize = this._initialize.bind(this);
@@ -152,7 +154,7 @@ export default class Chatroom extends React.Component<Props, State> {
       var {users} = this.state;
       var index = users.indexOf(oldName);
       users.splice(index, 1, newName);
-      this.setState({users, user: newName});
+      this.setState({users, user: newName, focusMessageBar: !this.state.focusMessageBar});
     });
   }
 
@@ -210,7 +212,7 @@ export default class Chatroom extends React.Component<Props, State> {
               })
             }
             </ul>
-            <MessageBar onMessageSubmit={this.handleMessageSubmit} onPrivateMessageSubmit={this.handlePrivateMessageSubmit} user={this.state.user} privateMessageTo={this.state.privateMessageTo}/>
+            <MessageBar onMessageSubmit={this.handleMessageSubmit} onPrivateMessageSubmit={this.handlePrivateMessageSubmit} user={this.state.user} privateMessageTo={this.state.privateMessageTo} focus={this.state.focusMessageBar}/>
           </Col>
         </div>
         {this.state.nameChangeActive ? <NameChangeModal user={this.state.user} onChangeName={this.handleChangeName}/> : null}

@@ -8,17 +8,25 @@ interface Props {
   onMessageSubmit: MessageSubmit;
   onPrivateMessageSubmit: PrivateMessageSubmit;
   privateMessageTo: string;
+  focus: boolean;
 }
 interface State {
   text: string;
 }
 
 export default class MessageBar extends React.Component<Props, State> {
+  private messageInput: HTMLTextAreaElement;
   constructor(props: Props) {
     super(props);
     this.state = { text: '' };
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.changeHandler = this.changeHandler.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+  
+  componentWillReceiveProps(nextProps: Props) {
+    if (this.props.focus !== nextProps.focus) {
+      this.messageInput.focus();
+    }
   }
 
   handleSubmit(event: React.FormEvent<HTMLElement>) {
@@ -42,7 +50,7 @@ export default class MessageBar extends React.Component<Props, State> {
       this.setState({ text: '' });
   }
 
-  changeHandler(event: React.ChangeEvent<HTMLTextAreaElement>) {
+  handleChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
       this.setState({ text : event.target.value });
   }
 
@@ -56,9 +64,10 @@ export default class MessageBar extends React.Component<Props, State> {
               <textarea
                 className="form-control messageArea"
                 value={this.state.text}
-                onChange={this.changeHandler}
+                onChange={this.handleChange}
                 placeholder={this.props.privateMessageTo.length === 0 ? 'Type your message here...' : 'Type your private message here...'}
                 required={true}
+                ref={textArea => this.messageInput = textArea as HTMLTextAreaElement}
               />
               <Button color="danger" title="Send message" type="submit">Send</Button>
             </InputGroup>

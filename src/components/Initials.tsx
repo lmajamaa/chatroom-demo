@@ -3,9 +3,7 @@ import * as React from 'react';
 interface Props {
   user: string;
 }
-interface State {
-  myCanvas: HTMLCanvasElement;
-}
+interface State { }
 
 export default class Initials extends React.Component<Props, State> {
   private myCanvas: HTMLCanvasElement;
