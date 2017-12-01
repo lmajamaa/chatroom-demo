@@ -149,7 +149,7 @@ export default class Chatroom extends React.Component<Props, State> {
     var oldName = this.state.user;
     socket.emit('user:changeName', { name : newName}, (result) => {
       if (!result) {
-          return alert('There was an error changing your name');
+        return alert('There was an error changing your name');
       }
       var {users} = this.state;
       var index = users.indexOf(oldName);
