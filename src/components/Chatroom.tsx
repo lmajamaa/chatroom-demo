@@ -72,15 +72,14 @@ export default class Chatroom extends React.Component<Props, State> {
   }
 
   _messageReceive(message: ChatMessage) {
-    var {messages} = this.state;
+    var messages = this.state.messages.concat();
     message.date = new Date();
     messages.push(message);
     this.setState({messages});
   }
   
   _privateMessageReceive(pm: PrivateMessage) {
-    var {messages} = this.state;
-    
+    var messages = this.state.messages.concat();
     var message = {
       user: pm.user + '  (PRIVATE)',
       text: pm.text,
@@ -91,60 +90,51 @@ export default class Chatroom extends React.Component<Props, State> {
   }
 
   _userJoined(data: InitializeData) {
-    var {users} = this.state;
-    var {name} = data;
-    users.push(name);
+    var users = this.state.users.concat();
+    users.push(data.name);
     this.setState({users});
   }
 
   _userLeft(data: InitializeData) {
-    var {users} = this.state;
-    var {name} = data;
-    var index = users.indexOf(name);
-    users.splice(index, 1);
+    var users = this.state.users.concat();
+    users.splice(users.indexOf(data.name), 1);
     this.setState({users});
   }
 
   _userChangedName(data: InitializeData) {
-    var {users} = this.state;
-    var {oldName, newName} = data;
-    var index = users.indexOf(oldName);
-    users.splice(index, 1, newName);
+    var users = this.state.users.concat();
+    users.splice(users.indexOf(data.oldName), 1, data.newName);
     this.setState({users});
   }
+  
   _channelUpdate(message: ChannelUpdate) {
-    var {messages} = this.state;
-    var {users} = message;
+    var messages = this.state.messages.concat();
     message.date = new Date();
     messages.push(message);
-    this.setState({messages});
-    this.setState({users});
+    this.setState({messages, users: message.users});
   }
+  
   handleMessageSubmit(message: ChatMessage) {
-    var {messages} = this.state;
+    var messages = this.state.messages.concat();
     messages.push(message);
     this.setState({messages});
     socket.emit('user:message', message);
   }
+  
   handlePrivateMessageSubmit(message: PrivateMessage) {
-    var {messages} = this.state;
-    this.setState({messages});
+    var messages = this.state.messages.concat();
     socket.emit('user:privateMessage', message);
-    this.setState({
-      privateMessageTo: ''
-    });
     var notification = {
       user: 'PRIVATE',
       text: 'Your private message has been sent to ' + message.to,
       date: new Date()
     };
     messages.push(notification);
+    this.setState({messages, privateMessageTo: ''});
   }
   
   handleChangeName(newName: string) {
-    this.setState({
-      nameChangeActive: false
-    });
+    this.setState({nameChangeActive: false});
     if (newName.length === 0) { return; }
     var oldName = this.state.user;
     socket.emit('user:changeName', { name : newName}, (result) => {
