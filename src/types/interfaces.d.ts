@@ -1,11 +1,9 @@
 // Structures
 interface ChatMessage {
   user: string;
+  channel: string;
   date: Date;
   text: string;
-}
-interface PrivateMessage extends ChatMessage {
-  to: string;
 }
 
 interface ChannelUpdate extends ChatMessage {
@@ -28,7 +26,7 @@ interface MessageSubmit {
   (message: ChatMessage): void;
 }
 interface PrivateMessageSubmit {
-  (message: PrivateMessage): void;
+  (message: ChatMessage): void;
 }
 interface NameChange {
   (newName: string): void;

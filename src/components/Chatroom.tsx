@@ -4,7 +4,7 @@ import * as React from 'react';
 import ChannelList from './ChannelList';
 import UserList from './UserList';
 import MessageBar from './MessageBar';
-import Message from './Message';
+import MessageList from './MessageList';
 import NameChangeModal from './NameChangeModal';
 import { Container, Col } from 'reactstrap';
 import '../styles/chatroom.css';
@@ -20,6 +20,7 @@ interface State {
   channels: string[];
   message: string;
   messages: ChatMessage[];
+  channelMessages: ChatMessage[];
   sidebarActive: boolean;
   nameChangeActive: boolean;
   privateMessageTo: string;
@@ -34,8 +35,10 @@ export default class Chatroom extends React.Component<Props, State> {
       user: '',
       users: [],
       channel: 'general',
-      channels: [], messages: [],
+      channels: [],
       message: '',
+      messages: [],
+      channelMessages: [],
       sidebarActive: false,
       nameChangeActive: true,
       privateMessageTo: '',
@@ -73,19 +76,16 @@ export default class Chatroom extends React.Component<Props, State> {
 
   _messageReceive(message: ChatMessage) {
     var messages = this.state.messages.concat();
+    var channelMessages = this.state.channelMessages.concat();
     message.date = new Date();
     messages.push(message);
-    this.setState({messages});
+    this.setState({messages, channelMessages});
   }
   
-  _privateMessageReceive(pm: PrivateMessage) {
+  _privateMessageReceive(privateMessage: ChatMessage) {
     var messages = this.state.messages.concat();
-    var message = {
-      user: pm.user + '  (PRIVATE)',
-      text: pm.text,
-      date: new Date()
-    };
-    messages.push(message);
+    privateMessage.user = privateMessage.user + '  (PRIVATE)';
+    messages.push(privateMessage);
     this.setState({messages});
   }
 
@@ -121,15 +121,10 @@ export default class Chatroom extends React.Component<Props, State> {
     socket.emit('user:message', message);
   }
   
-  handlePrivateMessageSubmit(message: PrivateMessage) {
+  handlePrivateMessageSubmit(message: ChatMessage) {
     var messages = this.state.messages.concat();
     socket.emit('user:privateMessage', message);
-    var notification = {
-      user: 'PRIVATE',
-      text: 'Your private message has been sent to ' + message.to,
-      date: new Date()
-    };
-    messages.push(notification);
+    messages.push(message);
     this.setState({messages, privateMessageTo: ''});
   }
   
@@ -148,9 +143,9 @@ export default class Chatroom extends React.Component<Props, State> {
     });
   }
 
-  handleChannelChange(channelName: string) {
-    socket.emit('user:changeChannel', channelName);
-    this.setState({messages: []});
+  handleChannelChange(channel: string) {
+    socket.emit('user:changeChannel', channel);
+    this.setState({channel, messages: []});
   }
   
   toggleSidebar() {
@@ -193,16 +188,15 @@ export default class Chatroom extends React.Component<Props, State> {
                 <i className={this.state.sidebarActive ? 'fa fa-chevron-right' : 'fa fa-chevron-left'}/> {this.state.sidebarActive ? '' : 'Users'}
                 </button>
             </p>
-            <ul className="list-unstyled">
-            {
-              this.state.messages.map((message, i) => {
-                return (
-                  <Message key={i} user={message.user} date={message.date} text={message.text} />
-                );
-              })
-            }
-            </ul>
-            <MessageBar onMessageSubmit={this.handleMessageSubmit} onPrivateMessageSubmit={this.handlePrivateMessageSubmit} user={this.state.user} privateMessageTo={this.state.privateMessageTo} focus={this.state.focusMessageBar}/>
+            <MessageList channel={this.state.channel} messages={this.state.messages}/>
+            <MessageBar
+              onMessageSubmit={this.handleMessageSubmit}
+              onPrivateMessageSubmit={this.handlePrivateMessageSubmit}
+              user={this.state.user}
+              channel={this.state.channel}
+              privateMessageTo={this.state.privateMessageTo}
+              focus={this.state.focusMessageBar}
+            />
           </Col>
         </div>
         {this.state.nameChangeActive ? <NameChangeModal user={this.state.user} onChangeName={this.handleChangeName}/> : null}

@@ -5,6 +5,7 @@ import { Navbar, Form, FormGroup, InputGroup, Button } from 'reactstrap';
 
 interface Props {
   user: string;
+  channel: string;
   onMessageSubmit: MessageSubmit;
   onPrivateMessageSubmit: PrivateMessageSubmit;
   privateMessageTo: string;
@@ -34,17 +35,18 @@ export default class MessageBar extends React.Component<Props, State> {
   sendMessage() {
   if (this.props.privateMessageTo.length === 0) {
     var message = {
-        user : this.props.user,
-        date : new Date(),
-        text : this.state.text
+        user: this.props.user,
+        channel: this.props.channel,
+        date: new Date(),
+        text: this.state.text
     };
     this.props.onMessageSubmit(message);
     } else {
       var privateMessage = {
-        user : this.props.user,
-        to : this.props.privateMessageTo,
-        date : new Date(),
-        text : this.state.text
+        user: this.props.user,
+        channel: this.props.privateMessageTo,
+        date: new Date(),
+        text: this.state.text
       };
       this.props.onPrivateMessageSubmit(privateMessage);
     }
