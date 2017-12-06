@@ -10,7 +10,7 @@ import { Container, Col } from 'reactstrap';
 import '../styles/chatroom.css';
 
 import * as openSocket from 'socket.io-client';
-const socket = openSocket(window.location.hostname + ':3001');
+const socket = window.location.hostname === 'localhost' ? openSocket(window.location.hostname + ':3001') : openSocket(window.location.hostname) ;
 
 interface Props { }
 interface State {
