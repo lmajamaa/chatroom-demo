@@ -6,6 +6,21 @@ interface ChatMessage {
   text: string;
 }
 
+interface ExampleClasses {
+  root: string;
+  appFrame: string;
+  appBar: string;
+  toolBar: string;
+  drawerPaper: string;
+  drawerModal: string;
+  drawerBackdrop: string;
+  drawerHeader: string;
+  bottomNavigation: string;
+  textField: string;
+  content: string;
+  listItem: string;
+}
+
 interface ChannelUpdate extends ChatMessage {
   users: string[];
 }
@@ -20,7 +35,6 @@ interface InitializeData {
   users: string[];
 }
 
-
 // Functions
 interface MessageSubmit {
   (message: ChatMessage): void;
@@ -32,7 +46,15 @@ interface NameChange {
   (newName: string): void;
 }
 
-interface Channel {
+interface DrawerToggle {
+  (): void;
+}
+
+interface ThemeSwitch {
+  (): void;
+}
+
+interface ChannelChange {
   (channelName: string): void;
 }
 

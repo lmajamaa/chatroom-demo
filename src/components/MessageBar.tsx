@@ -1,69 +1,61 @@
 /// <reference path="../types/interfaces.d.ts"/>
-
 import * as React from 'react';
-import { Navbar, Form, FormGroup, InputGroup, Button } from 'reactstrap';
+import BottomNavigation from 'material-ui/BottomNavigation';
+import Paper from 'material-ui/Paper';
+import TextField from 'material-ui/TextField';
+import Button from 'material-ui/Button';
 
 interface Props {
+  classes: ExampleClasses;
   user: string;
   channel: string;
-  onMessageSubmit: MessageSubmit;
-  onPrivateMessageSubmit: PrivateMessageSubmit;
   privateMessageTo: string;
   focus: boolean;
+  onMessageSubmit: MessageSubmit;
+  onPrivateMessageSubmit: PrivateMessageSubmit;
 }
 interface State {
   text: string;
 }
 
 export default class MessageBar extends React.Component<Props, State> {
-  private messageInput: HTMLTextAreaElement;
-  private messageSubmit: HTMLButtonElement;
   constructor(props: Props) {
     super(props);
     this.state = { text: '' };
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleTextAreaKeydown = this.handleTextAreaKeydown.bind(this);
-  }
-  
-  componentWillReceiveProps(nextProps: Props) {
-    if (this.props.focus !== nextProps.focus) {
-      this.messageInput.focus();
-    }
   }
 
-  sendMessage() {
-  if (this.props.privateMessageTo.length === 0) {
-    var message = {
-        user: this.props.user,
-        channel: this.props.channel,
-        date: new Date(),
-        text: this.state.text
-    };
-    this.props.onMessageSubmit(message);
-    } else {
-      var privateMessage = {
-        user: this.props.user,
-        channel: this.props.privateMessageTo,
-        date: new Date(),
-        text: this.state.text
+  sendMessage = () => {
+    if (this.props.privateMessageTo.length === 0) {
+      var message = {
+          user: this.props.user,
+          channel: this.props.channel,
+          date: new Date(),
+          text: this.state.text
       };
-      this.props.onPrivateMessageSubmit(privateMessage);
-    }
-  this.setState({ text: '' });
+      this.props.onMessageSubmit(message);
+      } else {
+        var privateMessage = {
+          user: this.props.user,
+          channel: this.props.privateMessageTo,
+          date: new Date(),
+          text: this.state.text
+        };
+        this.props.onPrivateMessageSubmit(privateMessage);
+      }
+    this.setState({ text: '' });
   }
-  handleSubmit(event: React.FormEvent<HTMLElement>) {
+  handleSubmit = (event: React.FormEvent<HTMLElement>) => {
     event.preventDefault();
     if (this.state.text.length > 0) {
       this.sendMessage();
     }
   }
 
-  handleChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ text : event.target.value });
   }
   
-  handleTextAreaKeydown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+  handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.keyCode === 13 && event.ctrlKey) {
       event.preventDefault();
       this.setState({ text : this.state.text + '\n' });
@@ -76,26 +68,37 @@ export default class MessageBar extends React.Component<Props, State> {
   }
 
   render() {
+    const classes = this.props.classes as ExampleClasses;
+    const messageBar = {
+      bottom: 0,
+    };
+    const container = {
+      width: '100%',
+    } as React.CSSProperties;
+    const buttonStyle = {
+      margin: 12,
+    };
+
     return(
-      <Navbar dark={true} className="fixed-bottom"> 
-        <Form className="messageForm" onSubmit={this.handleSubmit}>
-          <FormGroup>
-            <InputGroup>
-              {this.props.privateMessageTo.length === 0 ? null : <span className="input-group-addon">@{this.props.privateMessageTo}</span>}
-              <textarea
-                className="form-control messageArea"
-                value={this.state.text}
-                onChange={this.handleChange}
-                placeholder={this.props.privateMessageTo.length === 0 ? 'Type your message here...' : 'Type your private message here...'}
-                required={true}
-                ref={textArea => this.messageInput = textArea as HTMLTextAreaElement}
-                onKeyDown={this.handleTextAreaKeydown}
-              />
-              <Button color="danger" title="Send message" type="submit" ref={messageSubmit => this.messageSubmit = messageSubmit as HTMLButtonElement}>Send</Button>
-            </InputGroup>
-          </FormGroup>
-        </Form>
-      </Navbar>
+      <Paper elevation={4} className={classes.appBar} style={messageBar}>
+        <BottomNavigation className={classes.bottomNavigation}>
+          <form style={container} onSubmit={this.handleSubmit}>
+            {this.props.privateMessageTo.length === 0 ? null : <span className="input-group-addon">@{this.props.privateMessageTo}</span>}
+            <TextField
+              className={classes.textField}
+              value={this.state.text}
+              placeholder={this.props.privateMessageTo.length === 0 ? 'Type your message here...' : 'Type your private message here...'}
+              multiline={true}
+              required={true}
+              onChange={this.handleChange}
+              onKeyDown={this.handleKeyDown}
+            />
+            <Button raised={true} type="submit" color="primary" style={buttonStyle}>
+            Send
+            </Button>
+          </form>
+        </BottomNavigation>
+      </Paper>
     );
   }
 }

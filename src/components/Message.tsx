@@ -1,7 +1,7 @@
 import * as React from 'react';
+import Card, { CardHeader, CardContent } from 'material-ui/Card';
+import Typography from 'material-ui/Typography';
 import Initials from './Initials';
-import { Media } from 'reactstrap';
-import '../styles/message.css';
 
 interface Props {
   user: string;
@@ -14,21 +14,38 @@ export default class Message extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
   }
-    
+  
+  getMessageDate = () => {
+    var hours = ('0' + this.props.date.getHours()).slice(-2);
+    var minutes = ('0' + this.props.date.getMinutes()).slice(-2);
+    return hours + ':' + minutes;
+  }
+  
   render() {
+    const cardStyle = {
+      position: 'relative' as 'relative',
+      display: 'flex',
+      width: '100%',
+      height: 'auto'
+    };
+    const formattedTextStyle = {
+      marginTop: '13px',
+      whiteSpace: 'pre-wrap',
+      fontWeight: 200,
+    } as React.CSSProperties;
     return (
-      <li className="messageRow">
-        <Media>
-          <Initials user={this.props.user}/>
-          <Media body={true}>
-            <Media heading={true}>
-              <span className="messageUser mt-0">{this.props.user}</span>
-              <span className="messageTime"> ({('0' + this.props.date.getHours()).slice(-2)}:{('0' + this.props.date.getMinutes()).slice(-2)})</span>
-            </Media>
-            <pre className="messageText">{this.props.text}</pre>
-          </Media>
-        </Media>      
-      </li>
+      <Card style={cardStyle}>
+        <CardHeader
+          title={this.props.user}
+          subheader={this.getMessageDate()}
+          avatar={<Initials user={this.props.user} size={64}/>}
+        />
+        <CardContent>
+          <Typography style={formattedTextStyle}>
+            {this.props.text}
+          </Typography>
+        </CardContent>
+      </Card>
     );
   }
 }

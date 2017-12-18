@@ -1,11 +1,13 @@
-const isDevelopment = process.env.NODE_ENV !== "production";
-const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3001;
+let isDevelopment = process.env.NODE_ENV !== "production";
+let DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3001;
 
-var io = require('socket.io')();
+let io = require('socket.io')();
+let redis = require('redis');
+let redisClient = redis.createClient(process.env.REDIS_URL);
 
 if (isDevelopment) {
   // Run react-scripts-ts
-  var reactScripts = require('./react-scripts-ts-custom');
+  let reactScripts = require('./react-scripts-ts-custom');
   // Start Socket.IO
   io.listen(DEFAULT_PORT);
   console.log('Socket.io listening on *:port %d', DEFAULT_PORT);
@@ -25,8 +27,30 @@ if (isDevelopment) {
   server.listen(DEFAULT_PORT);  
 }
 
-// Default rooms
-var channels = ['general', 'development', 'random', 'project x'];
+  // Redis Client Ready
+  redisClient.once('ready', function() {
+
+    // Flush Redis DB
+    redisClient.flushdb();
+
+    // Initialize users
+    redisClient.get('chat_users', function(err, reply) {
+        if (reply) {
+          users = JSON.parse(reply);
+        }
+    });
+
+    // Initialize messages
+    redisClient.get('chat_messages', function(err, reply) {
+        if (reply) {
+          messages = JSON.parse(reply);
+        }
+    });
+  });
+
+let users = [];
+let channels = ['general', 'development', 'random', 'project x'];
+let messages = [];
 
 // User names handling
 var userNames = (function () {
