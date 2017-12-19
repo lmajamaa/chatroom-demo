@@ -13,4 +13,4 @@ To run:
  * npm start
  * http://localhost:3000
  
-![Screenshot](https://imgur.com/1XgoM7p)
+![Screenshot](https://i.imgur.com/1XgoM7p.png)
