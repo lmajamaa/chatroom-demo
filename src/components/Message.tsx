@@ -5,20 +5,24 @@ import Initials from './Initials';
 
 interface Props {
   user: string;
-  date: Date;
+  date: number;
   text: string;
 }
-interface State { }
 
-export default class Message extends React.Component<Props, State> {
+export default class Message extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
   }
   
   getMessageDate = () => {
-    var hours = ('0' + this.props.date.getHours()).slice(-2);
-    var minutes = ('0' + this.props.date.getMinutes()).slice(-2);
-    return hours + ':' + minutes;
+    try {
+      var date = new Date(this.props.date);
+      var hours = ('0' + date.getHours()).slice(-2);
+      var minutes = ('0' + date.getMinutes()).slice(-2);
+      return hours + ':' + minutes;
+    } catch (err) {
+      return err;
+    }
   }
   
   render() {

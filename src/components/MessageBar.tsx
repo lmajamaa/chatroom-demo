@@ -29,7 +29,7 @@ export default class MessageBar extends React.Component<Props, State> {
       var message = {
           user: this.props.user,
           channel: this.props.channel,
-          date: new Date(),
+          date: Date.now(),
           text: this.state.text
       };
       this.props.onMessageSubmit(message);
@@ -37,7 +37,7 @@ export default class MessageBar extends React.Component<Props, State> {
         var privateMessage = {
           user: this.props.user,
           channel: this.props.privateMessageTo,
-          date: new Date(),
+          date: Date.now(),
           text: this.state.text
         };
         this.props.onPrivateMessageSubmit(privateMessage);
@@ -83,7 +83,6 @@ export default class MessageBar extends React.Component<Props, State> {
       <Paper elevation={4} className={classes.appBar} style={messageBar}>
         <BottomNavigation className={classes.bottomNavigation}>
           <form style={container} onSubmit={this.handleSubmit}>
-            {this.props.privateMessageTo.length === 0 ? null : <span className="input-group-addon">@{this.props.privateMessageTo}</span>}
             <TextField
               className={classes.textField}
               value={this.state.text}

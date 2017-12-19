@@ -13,9 +13,8 @@ interface Props {
   handleDrawerToggle: DrawerToggle;
   handleThemeSwitch: ThemeSwitch;
 }
-interface State { }
 
-export default class ChannelHeader extends React.Component<Props, State> {
+export default class ChannelHeader extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
   }
@@ -31,6 +30,9 @@ export default class ChannelHeader extends React.Component<Props, State> {
           </IconButton>
           <Typography type="title" color="inherit" style={{flex: 1}}>
           Chatroom
+          </Typography>
+          <Typography type="title" color="inherit" style={{flex: 1}}>
+            # {this.props.channel}
           </Typography>
           <IconButton color="contrast" onClick={this.props.handleThemeSwitch}>
             <LightbulbOutline />

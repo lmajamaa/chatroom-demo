@@ -4,9 +4,8 @@ interface Props {
   user: string;
   size: number;
 }
-interface State { }
 
-export default class Initials extends React.Component<Props, State> {
+export default class Initials extends React.Component<Props> {
   private myCanvas: HTMLCanvasElement;
   constructor(props: Props) {
     super(props);

@@ -32,19 +32,22 @@ if (isDevelopment) {
 
     // Flush Redis DB
     redisClient.flushdb();
+    console.log('Redis flushed');
 
     // Initialize users
     redisClient.get('chat_users', function(err, reply) {
-        if (reply) {
-          users = JSON.parse(reply);
-        }
+      if (reply) {
+        users = JSON.parse(reply);
+        console.log('Redis users: ' + users);
+      }
     });
 
     // Initialize messages
     redisClient.get('chat_messages', function(err, reply) {
-        if (reply) {
-          messages = JSON.parse(reply);
-        }
+      if (reply) {
+        messages = JSON.parse(reply);
+        console.log('Redis messages: ' + messages);
+      }
     });
   });
 
@@ -53,21 +56,21 @@ let channels = ['general', 'development', 'random', 'project x'];
 let messages = [];
 
 // User names handling
-var userNames = (function () {
-  var names = {};
+let userNames = (function ()  {
+  let names = [];
 
-  var claim = function (name) {
-    if (!name || names[name]) {
+  let claim = function (name) {
+    if (names.includes(name)) {
       return false;
     } else {
-      names[name] = true;
+      names.push(name);
       return true;
     }
   };
 
   // Assign guest name and claim it
-  var getGuestName = function () {
-    var name,
+  let getGuestName = () => {
+    let name,
       nextUserId = 1;
 
     do {
@@ -78,21 +81,14 @@ var userNames = (function () {
     return name;
   };
 
-  // Serialize claimed names as an array
-  var get = function () {
-    var res = [];
-    for (user in names) {
-      res.push(user);
-    }
-
-    return res;
+  // Serialize taken names as an array
+  let get = function () {
+    return names;
   };
 
   // Free names
-  var free = function (name) {
-    if (names[name]) {
-      delete names[name];
-    }
+  let free = function (name) {
+    names = names.filter(item => item !== name)
   };
 
   return {
@@ -101,7 +97,7 @@ var userNames = (function () {
     get: get,
     getGuestName: getGuestName
   };
-}());
+})();
 
 // Retrieve users on current channel
 function getUsersOnChannel(channel) {
@@ -109,7 +105,7 @@ function getUsersOnChannel(channel) {
 
   for (var clientID in io.sockets.connected) {
     var socket = io.sockets.connected[clientID];
-    if(socket.channel == channel) {
+    if (socket.channels.includes(channel)) {
       list.push(socket.username)
     }
   }
@@ -134,111 +130,80 @@ io.on('connection', function (socket) {
   var name = userNames.getGuestName();
   socket.username = name;
   var address = socket.handshake.address;
-  socket.channel = 'general'
-  socket.join(socket.channel);
-  
+  socket.channels = channels;
+  for (let channel of channels) {
+    socket.join(channel); // Join channel
+    socket.to(channel).emit('user:join', { // Inform others that user has joined
+      users: getUsersOnChannel(channel)
+    });
+    console.log(name + ' joined channel #' + channel);
+  }
   // Init
   socket.emit('init', {
     name: name,
-    channel: socket.channel,
     channels: channels,
-    users: getUsersOnChannel(socket.channel)
+    users: getUsersOnChannel(channels[0]),
+    messages: messages
   });
   
-  console.log(name + ' joined channel #' + socket.channel);
-  socket.emit('channelUpdate', {
-    user: "Server",
-    channel: socket.channel,
-    date: new Date(),
-    text: 'You have joined channel #' + socket.channel,
-    users: getUsersOnChannel(socket.channel)
-  });
-  
-  // Inform others that user has joined
-  socket.to(socket.channel).emit('user:join', {
-    name: name,
-    address: address
-  });
-
   // Disconnect
   socket.on('disconnect', function () {
-    socket.to(socket.channel).emit('user:left', {
-      name: name
-    });
     userNames.free(name);
+    for (let channel of socket.channels) {
+      socket.to(channel).emit('user:left', {
+        users: getUsersOnChannel(channel)
+      });
+    }
   });
   
   // Message
   socket.on('user:message', function(data) {
-    console.log('#' + socket.channel + ' ' + socket.username + ': ' + data.text);
-    socket.to(socket.channel).emit('user:message', {
+    console.log('#' + data.channel + ' ' + socket.username + ': ' + data.text);
+    socket.to(data.channel).emit('user:message', {
       user: name,
-      channel: socket.channel,
-      date: new Date(),
+      channel: data.channel,
+      date: Date.now(),
       text: data.text
     });
   });
   
   // Change channel functionality
-  socket.on('user:changeChannel', function(channelName) {
-    
+  socket.on('user:leaveChannel', function(data) {
     // Leave old channel
-    socket.leave(socket.channel);
-    console.log(name + ' left channel #' + socket.channel);
-    socket.to(socket.channel).emit('user:message', {
-      user: "Server",
-      channel: socket.channel,
-      date: new Date(),
-      text: name + ' has left channel #' + socket.channel
-    });
-    
+    socket.leave(data.oldChannel);
+    console.log(name + ' left channel #' + data.oldChannel);
+
     // Inform other users that user has left
-    socket.to(socket.channel).emit('user:left', {
-      name: name
+    socket.to(data.oldChannel).emit('user:left', {
+      users: getUsersOnChannel(channel)
     });
-    
-    // Join new channel
-    socket.channel = channelName;
-    socket.join(socket.channel);
-    console.log(name + ' joined channel #' + socket.channel);
-    socket.emit('channelUpdate', {
+    socket.to(data.oldChannel).emit('user:message', {
       user: "Server",
-      channel: socket.channel,
-      date: new Date(),
-      text: 'You have joined channel #' + socket.channel,
-      users: getUsersOnChannel(socket.channel)
-    });
-    
-    // Inform other users that new user has joined
-    socket.to(socket.channel).emit('user:message', {
-      user: "Server",
-      channel: socket.channel,
-      date: new Date(),
-      text: name + ' has joined channel #' + socket.channel
-    });
-    
-    // Send join message to user
-    socket.to(socket.channel).emit('user:join', {
-      name: name,
-      channel: socket.channel,
-      address: address
+      channel: data.oldChannel,
+      date: Date.now(),
+      text: name + ' has left channel #' + data.oldChannel
     });
   });
   
   // New channel
-  socket.on('user:newChannel', function(channelName){
-    channels.push(channelName);
-    console.log('New channel created by user ' + name + ' :  #' + socket.channel);
+  socket.on('user:newChannel', function(channel){
+    channels.push(channel);
+    console.log('New channel created by user ' + name + ' :  #' + channel);
   });
-    
+  
+  socket.on('user:joinChannel', function(channel){
+    socket.to(channel).emit('user:join', { // Inform others that user has joined
+      users: getUsersOnChannel(channel)
+    });
+  });
   // Private message
   socket.on("user:privateMessage", function(data) {
-    console.log('Private message from ' + data.user + ' to ' + data.to);
-    var clientID = findTargetUser(data.to);
+    var clientID = findTargetUser(data.channel);
+    console.log('Private message from ' + data.user + ' to ' + data.channel + '(' + clientID + ')');
     io.sockets.connected[clientID].emit("user:privateMessage", {
-      user: data.user,
-      date: new Date(),
-      channel: data.to,
+      user: data.channel,
+      date: Date.now(),
+      channel: data.user,
       text: data.text
     });
    });
@@ -256,16 +221,22 @@ io.on('connection', function (socket) {
         newName: name
       });
       // Inform other users that user has changed name
-      socket.to(socket.channel).emit('user:message', {
+      socket.to(data.channel).emit('user:message', {
         user: "Server",
-        channel: socket.channel,
-        date: new Date(),
+        channel: data.channel,
+        date: Date.now(),
         text: oldName + ' has changed name to ' + name
       });
+      console.log(oldName + ' has changed name to ' + name);
       
       fn(true);
     } else {
       fn(false);
     }
+  });
+  socket.on('user:getUsers', function(channel){
+    socket.emit('channelUpdate', {
+      users: getUsersOnChannel(channel)
+    });
   });
 });

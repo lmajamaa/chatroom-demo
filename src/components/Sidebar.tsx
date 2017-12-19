@@ -10,7 +10,7 @@ import Hidden from 'material-ui/Hidden';
 interface Props {
   classes: ExampleClasses;
   channels: string[];
-  initialChannel: string;
+  channel: string;
   user: string;
   users: string[];
   handleChannelChange: ChannelChange;
@@ -19,22 +19,13 @@ interface Props {
   sidebarOpen: boolean;
 }
 
-interface State {
-  currentChannel: string;
-}
-
-export default class Sidebar extends React.Component<Props, State> {
+export default class Sidebar extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
-
-    this.state = {
-      currentChannel: props.initialChannel,
-    };
   }
 
   changeChannel = (targetChannel: string) => {
-    if (this.state.currentChannel !== targetChannel) {    
-      this.setState({currentChannel: targetChannel});
+    if (this.props.channel !== targetChannel) {    
       this.props.handleChannelChange(targetChannel);
     }
   }
@@ -47,8 +38,20 @@ export default class Sidebar extends React.Component<Props, State> {
     }
   }
   
+  handleUserClick = (user: string) => {
+    this.props.enablePrivateMessage(user);
+  }
+  
+  isActive = (channel) => {
+    return channel === this.props.channel;
+  }
   render() {
     const { channels, classes, sidebarOpen } = this.props;
+    const inActive = {
+    };
+    const active = {
+      backgroundColor: '#546E7A',
+    };
     const drawerContent = (
       <div>
         <div className={classes.drawerHeader}>
@@ -61,7 +64,7 @@ export default class Sidebar extends React.Component<Props, State> {
         {
           channels.map((channel, i) => {
             return (
-              <ListItem button={true} key={i} onClick={() => this.changeChannel(channel)}>
+              <ListItem button={true} key={i} onClick={() => this.changeChannel(channel)} style={this.isActive(channel) ? active : inActive}>
                 <ListItemText primary={'# ' + channel} />
               </ListItem>
             );
@@ -79,7 +82,7 @@ export default class Sidebar extends React.Component<Props, State> {
         {
           this.props.users.map((user: string, i: number) => {
             return (
-              <ListItem button={true} key={i} onClick={() => this.props.enablePrivateMessage(user)}>
+              <ListItem button={true} key={i} onClick={() => this.handleUserClick(user)} style={this.isActive(user) ? active : inActive}>
                 <Initials user={user} size={32}/>
                 <ListItemText primary={this.getUsername(user, this.props.user)} />
               </ListItem>

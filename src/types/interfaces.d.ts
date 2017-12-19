@@ -2,7 +2,7 @@
 interface ChatMessage {
   user: string;
   channel: string;
-  date: Date;
+  date: number;
   text: string;
 }
 

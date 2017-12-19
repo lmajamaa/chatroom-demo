@@ -24,6 +24,10 @@ export default class NameChangeModal extends React.Component<Props, State> {
       open: true };
   }
   
+  handleCancel = () => {
+    this.props.onChangeName('');
+  }
+  
   handleClose = () => {
     var newName = this.state.newName;
     this.props.onChangeName(newName);    
@@ -40,7 +44,7 @@ export default class NameChangeModal extends React.Component<Props, State> {
   render() {
     return(
       <Dialog open={this.state.open} onClose={this.handleClose}>
-        <DialogTitle>Enter your username</DialogTitle>
+        <DialogTitle>Set your username</DialogTitle>
         <DialogContent>
           <TextField
             value={this.state.newName}
@@ -53,7 +57,7 @@ export default class NameChangeModal extends React.Component<Props, State> {
           />
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
+            <Button onClick={this.handleCancel} color="primary">
               Cancel
             </Button>
             <Button onClick={this.handleClose} color="primary">

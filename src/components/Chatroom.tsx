@@ -19,7 +19,6 @@ interface State {
   channels: string[];
   message: string;
   messages: ChatMessage[];
-  channelMessages: ChatMessage[];
   sidebarOpen: boolean;
   nameChangeActive: boolean;
   privateMessageTo: string;
@@ -42,7 +41,6 @@ class Chatroom extends React.Component<WithStyles<keyof typeof styles>, State> {
       channels: [],
       message: '',
       messages: [],
-      channelMessages: [],
       sidebarOpen: true,
       nameChangeActive: true,
       privateMessageTo: '',
@@ -59,83 +57,75 @@ class Chatroom extends React.Component<WithStyles<keyof typeof styles>, State> {
     socket.on('channelUpdate', this._channelUpdate); 
   }
   _initialize = (data: InitializeData) => {
-    var {users, channel, channels, name} = data;
-    this.setState({users, channel, channels, user: name});
+    let {users, channels, name} = data;
+    this.setState({users, channel: channels[0], channels, user: name});
   }
 
   _messageReceive = (message: ChatMessage) => {
-    var messages = this.state.messages.concat();
-    var channelMessages = this.state.channelMessages.concat();
-    message.date = new Date();
+    let messages = this.state.messages.concat();
     messages.push(message);
-    this.setState({messages, channelMessages});
+    this.setState({messages});
   }
   
-  _privateMessageReceive = (privateMessage: ChatMessage) => {
-    var messages = this.state.messages.concat();
-    privateMessage.user = privateMessage.user + '  (PRIVATE)';
-    messages.push(privateMessage);
+  _privateMessageReceive = (message: ChatMessage) => {
+    let messages = this.state.messages.concat();
+    messages.push(message);
     this.setState({messages});
   }
 
-  _userJoined = (data: InitializeData) => {
-    var users = this.state.users.concat();
-    users.push(data.name);
-    this.setState({users});
+  _userJoined = (message: ChannelUpdate) => {
+    this.setState({users: message.users});
   }
 
-  _userLeft = (data: InitializeData) => {
-    var users = this.state.users.concat();
-    users.splice(users.indexOf(data.name), 1);
-    this.setState({users});
+  _userLeft = (message: ChannelUpdate) => {
+    this.setState({users: message.users});
   }
 
-  _userChangedName = (data: InitializeData) => {
-    var users = this.state.users.concat();
-    users.splice(users.indexOf(data.oldName), 1, data.newName);
+  _userChangedName = (message: InitializeData) => {
+    let users = this.state.users.concat();
+    users.splice(users.indexOf(message.oldName), 1, message.newName);
     this.setState({users});
   }
   
   _channelUpdate = (message: ChannelUpdate) => {
-    var messages = this.state.messages.concat();
-    message.date = new Date();
-    messages.push(message);
-    this.setState({messages, users: message.users});
+    this.setState({users: message.users});
   }
   
   handleMessageSubmit = (message: ChatMessage) => {
-    var messages = this.state.messages.concat();
+    let messages = this.state.messages.concat();
     messages.push(message);
     this.setState({messages});
     socket.emit('user:message', message);
   }
   
   handlePrivateMessageSubmit = (message: ChatMessage) => {
-    var messages = this.state.messages.concat();
+    let messages = this.state.messages.concat();
     socket.emit('user:privateMessage', message);
     messages.push(message);
-    this.setState({messages, privateMessageTo: ''});
+    this.setState({messages});
   }
   
   handleChangeName = (newName: string) => {
+    let oldName = this.state.user;
     this.setState({nameChangeActive: false});
-    if (newName.length === 0) { return; }
-    var oldName = this.state.user;
+    if (newName.length === 0 || newName === oldName) { return; }
+    
     socket.emit('user:changeName', { name : newName}, (result) => {
       if (!result) {
         return alert('There was an error changing your name');
       }
-      var {users} = this.state;
-      var index = users.indexOf(oldName);
+      let {users} = this.state;
+      let index = users.indexOf(oldName);
       users.splice(index, 1, newName);
       this.setState({users, user: newName, focusMessageBar: !this.state.focusMessageBar});
       localStorage.setItem('userName', newName);
     });
   }
 
+  // Change channel, disable private message mode if it was enabled
   handleChannelChange = (channel: string) => {
-    socket.emit('user:changeChannel', channel);
-    this.setState({channel, messages: []});
+    socket.emit('user:getUsers', channel);
+    this.setState({channel, privateMessageTo: ''});
   }
   
   // Enable/disable private message mode. Disable also if current user is selected
@@ -147,7 +137,8 @@ class Chatroom extends React.Component<WithStyles<keyof typeof styles>, State> {
         });
       } else {
         this.setState({
-          privateMessageTo: user
+          privateMessageTo: user,
+          channel: user
         });
       }
     } else {
@@ -183,7 +174,7 @@ class Chatroom extends React.Component<WithStyles<keyof typeof styles>, State> {
           <Sidebar
             classes={classes}
             channels={this.state.channels}
-            initialChannel={this.state.channel}
+            channel={this.state.channel}
             user={this.state.user}
             users={this.state.users}
             sidebarOpen={this.state.sidebarOpen}
