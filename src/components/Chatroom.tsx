@@ -129,6 +129,7 @@ class Chatroom extends React.Component<WithStyles<keyof typeof styles>, State> {
       var index = users.indexOf(oldName);
       users.splice(index, 1, newName);
       this.setState({users, user: newName, focusMessageBar: !this.state.focusMessageBar});
+      localStorage.setItem('userName', newName);
     });
   }
 

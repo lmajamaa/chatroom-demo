@@ -12,20 +12,16 @@ interface Props {
   user: string;
 }
 interface State {
-    newName: string;
-    open: boolean;
+  newName: string;
+  open: boolean;
 }
 export default class NameChangeModal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { newName: '', open: true };
-  }
-  
-  toggle() {
-    this.setState({
-      open: !this.state.open
-    });
-    this.props.onChangeName('');
+    const storedUserName = localStorage.getItem('userName');
+    this.state = {
+      newName: storedUserName !== null ? storedUserName : '',
+      open: true };
   }
   
   handleClose = () => {
