@@ -17,7 +17,6 @@ interface State {
   users: string[];
   channel: string;
   channels: string[];
-  message: string;
   messages: ChatMessage[];
   sidebarOpen: boolean;
   nameChangeActive: boolean;
@@ -39,7 +38,6 @@ class Chatroom extends React.Component<WithStyles<keyof typeof styles>, State> {
       users: [],
       channel: 'general',
       channels: [],
-      message: '',
       messages: [],
       sidebarOpen: true,
       nameChangeActive: true,
@@ -57,8 +55,8 @@ class Chatroom extends React.Component<WithStyles<keyof typeof styles>, State> {
     socket.on('channelUpdate', this._channelUpdate); 
   }
   _initialize = (data: InitializeData) => {
-    let {users, channels, name} = data;
-    this.setState({users, channel: channels[0], channels, user: name});
+    let {user, users, channels, messages} = data;
+    this.setState({user, users, channel: channels[0], channels, messages});
   }
 
   _messageReceive = (message: ChatMessage) => {

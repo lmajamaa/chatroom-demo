@@ -34,24 +34,15 @@ if (isDevelopment) {
     redisClient.flushdb();
     console.log('Redis flushed');
 
-    // Initialize users
-    redisClient.get('chat_users', function(err, reply) {
-      if (reply) {
-        users = JSON.parse(reply);
-        console.log('Redis users: ' + users);
-      }
-    });
-
     // Initialize messages
     redisClient.get('chat_messages', function(err, reply) {
       if (reply) {
         messages = JSON.parse(reply);
-        console.log('Redis messages: ' + messages);
       }
     });
   });
 
-let users = [];
+//let users = [];
 let channels = ['general', 'development', 'random', 'project x'];
 let messages = [];
 
@@ -140,7 +131,7 @@ io.on('connection', function (socket) {
   }
   // Init
   socket.emit('init', {
-    name: name,
+    user: name,
     channels: channels,
     users: getUsersOnChannel(channels[0]),
     messages: messages
@@ -159,12 +150,17 @@ io.on('connection', function (socket) {
   // Message
   socket.on('user:message', function(data) {
     console.log('#' + data.channel + ' ' + socket.username + ': ' + data.text);
-    socket.to(data.channel).emit('user:message', {
+    var message = {
       user: name,
       channel: data.channel,
       date: Date.now(),
       text: data.text
-    });
+    };
+    
+    socket.to(data.channel).emit('user:message', message);
+    
+    messages.push(message);
+    redisClient.set('chat_messages', JSON.stringify(messages));
   });
   
   // Change channel functionality

@@ -26,13 +26,13 @@ interface ChannelUpdate extends ChatMessage {
 }
 
 interface InitializeData {
-  name: string;
+  user: string;
+  users: string[];
   oldName: string;
   newName: string;
-  user: string;
   channel: string;
   channels: string[];
-  users: string[];
+  messages: ChatMessage[];
 }
 
 // Functions
